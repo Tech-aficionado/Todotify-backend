@@ -17,9 +17,23 @@ const dbConfig = {
   database: process.env.DB_DATABASE,
   port: process.env.DB_PORT
 };
-app.use(cors({
-}));
-
+const allowedOrigins = [
+    "http://localhost:4200",              // Local dev (e.g., Angular)
+    "https://todotify-912e9.web.app"      // Production frontend
+  ];
+  
+  app.use(cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g., Postman) or if origin is in allowed list
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  }));
 app.use(express.json());
 
 

@@ -17,14 +17,14 @@ const dbConfig = {
     port: process.env.DB_PORT
 };
 const allowedOrigins = [
-    'http://localhost:4200', // Local dev (e.g., Angular)
-    'https://todotify-912e9.web.app' // Production frontend
+    'http://localhost:4200', 
+    'https://todotify-912e9.web.app' 
 ];
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (e.g., Postman) or if origin is in allowed list
+            
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
@@ -46,7 +46,24 @@ function tokenGenerator() {
     for (let i = 0; i < 30; i++) {
         id += keys.charAt(Math.floor(Math.random() * keys.length));
     }
+
+    checkUsername().then((res)=>{
+        if(res.length == 0){
+            return id
+        }else{
+            tokenGenerator()
+        }
+    })
+    
     return id;
+}
+
+const checkUsername = async (id)=> {
+    const sqlsearch = 'SELECT * FROM users WHERE username = ? ';
+    const query = pool.format(sqlsearch, [id]);
+    const [user] = await pool.execute(query);
+
+    return user
 }
 const pool = mysql.createPool(dbConfig);
 
@@ -86,7 +103,7 @@ app.post('/login', async (req, res) => {
         let jwtSecretKey = process.env.JWT_SECRET_KEY;
 
         const options = {
-            expiresIn: '1h',
+            expiresIn: '5h',
             issuer: 'Shivansh Goel',
             subject: 'Auth Token - Todotify',
             audience: userDetail['fullname'],
@@ -142,7 +159,7 @@ app.post('/createUser', async (req, res) => {
             };
 
             const options = {
-                expiresIn: '1h',
+                expiresIn: '5h',
                 issuer: 'Shivansh Goel',
                 subject: 'Auth Token - Todotify',
                 audience: req.body.fullname,

@@ -1,27 +1,20 @@
-
-import * as nodemailer from 'nodemailer'
+import * as nodemailer from 'nodemailer';
 import { otpGenerator } from './otpauth.js';
-
-
-
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'todotify02@gmail.com',
-      pass: 'rluz bbcd flyb taum'
+        user: 'todotify02@gmail.com',
+        pass: 'rluz bbcd flyb taum'
     }
-  });
+});
 
-  
-  
+const sendOTPMail = (mail) => {
+    return new Promise((resolve, reject) => {
+        var otp = otpGenerator(mail);
+        console.log(otp);
 
-const sendOTPMail = (mail)=>{
-  return new Promise((resolve, reject) => {
-    var otp = otpGenerator(mail)
-    console.log(otp)
-    
-var html_content = `
+        var html_content = `
 <html>
   <body>
     <div style="background: #020617;color:white ;height: 600px; width: 700px; border-radius: 0; padding: 20px;">
@@ -51,27 +44,25 @@ var html_content = `
 </body>
 </html>
 
-`
+`;
 
-    var mailOptions = {
-        from: 'todotify02@gmail.com',
-        to: mail,
-        subject: 'OTP - Todotify',
-        html: html_content,
-        
-      };
-      
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-          reject("Error",error)
-        } else {
-          console.log('Email sent: ' + info.response);
-          resolve("Code Sent")
-        }
-      });
-})
-}
-    
+        var mailOptions = {
+            from: 'todotify02@gmail.com',
+            to: mail,
+            subject: 'OTP - Todotify',
+            html: html_content
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+                reject('Error', error);
+            } else {
+                console.log('Email sent: ' + info.response);
+                resolve('Code Sent');
+            }
+        });
+    });
+};
 
 export default sendOTPMail;
